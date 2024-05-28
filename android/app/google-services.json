@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "464109917669",
+    "project_id": "kudosware-3ad00",
+    "storage_bucket": "kudosware-3ad00.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464109917669:android:27ed6d424130d4f5d9cb0c",
+        "android_client_info": {
+          "package_name": "com.lovishsingla.teachers_assistant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxSKS0R-htBuG0VvUKejhNK9A3DA1McG0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
