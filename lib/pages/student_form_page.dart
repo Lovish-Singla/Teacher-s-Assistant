@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:teachers_assistant/models/student_model.dart';
+import 'package:teachers_assistant/services/student_service.dart';
 
 import '../widgets/custom_textformfield.dart';
 
@@ -14,6 +17,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
   final _nameController = TextEditingController();
   final _dobController = TextEditingController();
   String? _gender;
+  StudentService _studentService = StudentService();
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +62,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                     lastDate: DateTime(2101),
                   );
                   if (date != null) {
-                    _dobController.text = date.toIso8601String().split("T")[0];
+                    _dobController.text = date.toIso8601String();
                     ;
                   }
                 },
@@ -114,9 +118,24 @@ class _StudentFormPageState extends State<StudentFormPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    // Add form submission functionality
+                    // First we will create a instance of current user, make a student object
+                    // and then add the student.
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      final student = Student(
+                        name: _nameController.text,
+                        dob: DateTime.parse(_dobController.text),
+                        gender: _gender!,
+                      );
+                      await _studentService.addStudent(user.uid, student);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Student added successfully')),
+                      );
+                      _formKey.currentState!.reset();
+                    }
                   }
                 },
                 child: const Text('Submit'),
