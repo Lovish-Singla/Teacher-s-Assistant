@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:teachers_assistant/pages/login_page.dart';
 import 'package:teachers_assistant/pages/student_form_page.dart';
 import 'package:teachers_assistant/pages/student_list_page.dart';
 
@@ -34,8 +35,12 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () async {
-              await _authService.signout();
-              Navigator.pushReplacementNamed(context, '/');
+              bool confirmLogout = await _showLogoutConfirmationDialog(context);
+              if (confirmLogout) {
+                await _authService.signout();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LoginPage()));
+              }
             },
             icon: const Icon(Icons.logout_rounded),
           ),
@@ -61,5 +66,32 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Future<bool> _showLogoutConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Confirm Logout'),
+              content: Text('Are you sure you want to logout?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text('Logout'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 }

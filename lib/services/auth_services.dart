@@ -1,14 +1,34 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<String?> getUserIdFromPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userId');
+  }
+
+  Future<void> _saveUserId(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userId);
+  }
+
+  Future<void> _removeUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
+  }
 
   // Signing user in
   Future<User?> signin(String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-      return result.user;
+      User? user = result.user;
+      if(user != null){
+        await _saveUserId(user.uid);
+      }
+      return user;
     } catch (e) {
       print(e.toString());
       return null;
@@ -24,7 +44,7 @@ class AuthService {
       if (user != null) {
         await user.sendEmailVerification();
       }
-      return result.user;
+      return user;
     } catch (e) {
       print(e.toString());
       return null;
@@ -35,6 +55,7 @@ class AuthService {
   Future<void> signout() async {
     try {
       await _auth.signOut();
+      await _removeUserId();
     } catch (e) {
       print(e.toString());
     }
@@ -43,5 +64,9 @@ class AuthService {
   // Getter for user
   Stream<User?> get user {
     return _auth.authStateChanges();
+  }
+
+  User? getCurrentUser() {
+    return _auth.currentUser;
   }
 }
